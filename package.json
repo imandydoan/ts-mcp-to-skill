@@ -1,5 +1,5 @@
 {
-  "name": "mcp-to-skill",
+  "name": "mcp-to-skill-with-headers",
   "version": "0.2.2",
   "type": "module",
   "description": "Convert MCP servers to Claude Skills with progressive disclosure",

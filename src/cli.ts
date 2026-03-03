@@ -34,16 +34,29 @@ export async function run(): Promise<void> {
     .command('exec')
     .description('Execute MCP tools at runtime')
     .requiredOption('--config <path>', 'Path to mcp-config.json')
+    .option('--headers <json>', 'Additional headers as JSON string')
     .option('--list', 'List available tools')
     .option('--describe <tool>', 'Get detailed schema for a tool')
     .option('--call <json>', 'Call a tool with JSON arguments')
     .action(async (options: {
       config: string;
+      headers?: string;
       list?: boolean;
       describe?: string;
       call?: string;
     }) => {
-      const executor = new MCPExecutor(options.config);
+      let parsedHeaders: Record<string, string> | undefined;
+
+      if (options.headers) {
+        try {
+          parsedHeaders = JSON.parse(options.headers);
+        } catch (err) {
+          console.error('Invalid JSON for --headers');
+          process.exit(1);
+        }
+      }
+
+      const executor = new MCPExecutor(options.config, parsedHeaders);
 
       try {
         if (options.list) {
@@ -71,7 +84,12 @@ export async function run(): Promise<void> {
           console.log('Usage:');
           console.log('  mcp-to-skill exec --config <path> --list');
           console.log('  mcp-to-skill exec --config <path> --describe <tool_name>');
-          console.log('  mcp-to-skill exec --config <path> --call \'{"tool": "name", "arguments": {...}}\'');
+          console.log(
+            '  mcp-to-skill exec --config <path> --call \'{"tool": "name", "arguments": {...}}\''
+          );
+          console.log(
+            '  mcp-to-skill exec --config <path> --headers \'{"Authorization":"Bearer token"}\' --list'
+          );
         }
       } finally {
         await executor.close();

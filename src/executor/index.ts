@@ -34,7 +34,7 @@ export class MCPExecutor {
   private config: MCPConfig;
   private client: Client | null = null;
 
-  constructor(configPathOrConfig: string | MCPConfig) {
+  constructor(configPathOrConfig: string | MCPConfig, additionalHeaders?: Record<string, string>) {
     if (typeof configPathOrConfig === 'string') {
       // Load config from file path
       const configPath = path.resolve(configPathOrConfig);
@@ -45,6 +45,9 @@ export class MCPExecutor {
     } else {
       // Use config object directly
       this.config = configPathOrConfig;
+    }
+    if (isHttpConfig(this.config)) {
+      this.config = { ...this.config, headers: { ...this.config.headers || {}, ...additionalHeaders } }
     }
   }
 
